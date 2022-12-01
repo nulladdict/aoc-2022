@@ -11,7 +11,7 @@ $ cargo run -p day-01 --release
 Or by using just:
 
 ```shell
-$ just r day-01
+$ just r 01
 ```
 
 Some days might require nightly toolchain

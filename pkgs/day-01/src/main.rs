@@ -6,12 +6,12 @@ use nom::{
 };
 
 fn main() {
-    let mut elfs = parse(include_str!("in")).unwrap().1;
+    let mut elves = parse(include_str!("in")).unwrap().1;
 
-    elfs.sort_by(|a, b| b.cmp(a));
+    elves.sort_by(|a, b| b.cmp(a));
 
-    dbg!(part1(&elfs));
-    dbg!(part2(&elfs));
+    dbg!(part1(&elves));
+    dbg!(part2(&elves));
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<u64>> {
@@ -27,10 +27,10 @@ fn parse(input: &str) -> IResult<&str, Vec<u64>> {
     )(input)
 }
 
-fn part1(elfs: &[u64]) -> u64 {
-    elfs[0]
+fn part1(elves: &[u64]) -> u64 {
+    elves[0]
 }
 
-fn part2(elfs: &[u64]) -> u64 {
-    elfs.iter().take(3).sum::<u64>()
+fn part2(elves: &[u64]) -> u64 {
+    elves.iter().take(3).sum::<u64>()
 }

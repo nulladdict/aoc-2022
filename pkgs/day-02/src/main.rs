@@ -2,14 +2,14 @@ use std::str::FromStr;
 
 use nom::{
     character::complete::{alpha1, line_ending, multispace1},
-    combinator::map_opt,
+    combinator::{all_consuming, map_opt},
     multi::separated_list1,
     sequence::separated_pair,
     IResult,
 };
 
 fn main() {
-    let (_, strategy) = parse(include_str!("in")).unwrap();
+    let (_, strategy) = parse(include_str!("in").trim()).unwrap();
     dbg!(part1(&strategy));
     dbg!(part2(&strategy));
 }
@@ -36,7 +36,7 @@ impl FromStr for Shape {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<(Shape, Shape)>> {
-    separated_list1(
+    all_consuming(separated_list1(
         line_ending,
         map_opt(
             separated_pair(alpha1, multispace1, alpha1),
@@ -46,7 +46,7 @@ fn parse(input: &str) -> IResult<&str, Vec<(Shape, Shape)>> {
                 Some((a, x))
             },
         ),
-    )(input)
+    ))(input)
 }
 
 fn count_score(strategy: &[(Shape, Shape)]) -> u64 {

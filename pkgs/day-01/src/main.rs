@@ -1,12 +1,12 @@
 use nom::{
     character::complete::{digit1, line_ending},
-    combinator::{map, map_res},
+    combinator::{all_consuming, map, map_res},
     multi::{count, separated_list1},
     IResult,
 };
 
 fn main() {
-    let mut elves = parse(include_str!("in")).unwrap().1;
+    let mut elves = parse(include_str!("in").trim()).unwrap().1;
 
     elves.sort_by(|a, b| b.cmp(a));
 
@@ -15,7 +15,7 @@ fn main() {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<u64>> {
-    separated_list1(
+    all_consuming(separated_list1(
         count(line_ending, 2),
         map(
             separated_list1(
@@ -24,7 +24,7 @@ fn parse(input: &str) -> IResult<&str, Vec<u64>> {
             ),
             |elf| elf.into_iter().sum(),
         ),
-    )(input)
+    ))(input)
 }
 
 fn part1(elves: &[u64]) -> u64 {

@@ -11,12 +11,25 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
-use num::Complex;
+use num::{Complex, Signed};
 
 fn main() {
     let (_, moves) = parse(include_str!("in").trim_end()).unwrap();
     dbg!(part1(&moves));
     dbg!(part2(&moves));
+}
+
+trait Chebyshev<T>
+where
+    T: Clone + Signed + Ord,
+{
+    fn max_norm(&self) -> T;
+}
+
+impl<T: Clone + Signed + Ord> Chebyshev<T> for Complex<T> {
+    fn max_norm(&self) -> T {
+        std::cmp::max(self.re.abs(), self.im.abs())
+    }
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -67,7 +80,7 @@ fn walk<const LENGTH: usize>(moves: &[Move]) -> usize {
                 let current = knots[i];
                 let previous = knots[i - 1];
                 let delta = previous - current;
-                if delta.norm_sqr() > 2 {
+                if delta.max_norm() > 1 {
                     knots[i] += Complex::new(delta.re.signum(), delta.im.signum());
                 }
             }

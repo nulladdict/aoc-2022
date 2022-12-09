@@ -11,6 +11,7 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
+use num::Complex;
 
 fn main() {
     let (_, moves) = parse(include_str!("in").trim_end()).unwrap();
@@ -28,15 +29,15 @@ enum Direction {
 impl Direction {
     fn offset(&self) -> Point {
         match self {
-            Self::Up => (0, 1),
-            Self::Right => (1, 0),
-            Self::Down => (0, -1),
-            Self::Left => (-1, 0),
+            Self::Up => Complex::new(0, 1),
+            Self::Right => Complex::new(1, 0),
+            Self::Down => Complex::new(0, -1),
+            Self::Left => Complex::new(-1, 0),
         }
     }
 }
 
-type Point = (i32, i32);
+type Point = Complex<i32>;
 type Move = (Direction, u32);
 
 fn parse(input: &str) -> IResult<&str, Vec<Move>> {
@@ -55,28 +56,22 @@ fn parse(input: &str) -> IResult<&str, Vec<Move>> {
     ))(input)
 }
 
-fn move_by(left: &mut Point, right: Point) {
-    left.0 += right.0;
-    left.1 += right.1;
-}
-
 fn walk<const LENGTH: usize>(moves: &[Move]) -> usize {
-    let mut knots = [(0, 0); LENGTH];
+    let mut knots = [Complex::new(0, 0); LENGTH];
     let mut visited = HashSet::new();
     visited.insert(knots[LENGTH - 1]);
     for &(direction, size) in moves {
         for _ in 0..size {
-            move_by(&mut knots[0], direction.offset());
+            knots[0] += direction.offset();
             for i in 1..LENGTH {
                 let current = knots[i];
                 let previous = knots[i - 1];
-                let dx = previous.0 - current.0;
-                let dy = previous.1 - current.1;
-                if dx.abs() >= 2 || dy.abs() >= 2 {
-                    move_by(&mut knots[i], (dx.signum(), dy.signum()));
+                let delta = previous - current;
+                if delta.norm_sqr() > 2 {
+                    knots[i] += Complex::new(delta.re.signum(), delta.im.signum());
                 }
             }
-            visited.insert(*knots.last().unwrap());
+            visited.insert(knots[LENGTH - 1]);
         }
     }
     visited.len()
